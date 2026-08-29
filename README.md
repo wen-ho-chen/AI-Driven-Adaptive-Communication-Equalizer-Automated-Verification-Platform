@@ -10,7 +10,7 @@
    * 設計不同 SNR 環境（如 25dB 正常環境與 5dB 惡劣環境）的壓力測試場景（Stress / Corner Case Test）。
 
 ## 🛠️ 開發環境
-* Python 3.x
+* Python 3.11
 * NumPy (矩陣與複數運算)
 * Matplotlib (波形與星座圖分析)
 
