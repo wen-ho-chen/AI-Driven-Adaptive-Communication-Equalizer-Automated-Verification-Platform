@@ -1,0 +1,7 @@
+{
+    "python.pythonPath":
+    "C:\\Users\\ANHH\\AppData\\Local\\Programs\\Python\\Python314\\python.exe",
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python-envs.defaultEnvManager": "ms-python.python:system",
+}
