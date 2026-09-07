@@ -74,7 +74,7 @@ python equalizer_qa_platform.py
 
 ### Expected Console Output Template
 ```text
-=== [QA Test Case] Executing '3-in-1' Adaptive Equalizer Regression Test (SNR: 20dB) ===
+=== [QA Test Case] Executing '3-in-1' Adaptive Equalizer Regression Test (SNR: 15dB) ===
   Algorithm [LMS (Traditional)] -> Steady-state MSE: 0.09014 | Spec Limit: 0.10000 | Test Result: PASS
   Algorithm [RLS (Recursive)]    -> Steady-state MSE: 0.08843 | Spec Limit: 0.10000 | Test Result: PASS
   Algorithm [Adam (AI Adaptive)] -> Steady-state MSE: 0.09547 | Spec Limit: 0.10000 | Test Result: PASS
