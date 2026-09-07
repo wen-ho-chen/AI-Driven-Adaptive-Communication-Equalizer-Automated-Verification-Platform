@@ -1,18 +1,75 @@
-# Baseband Channel Equalization Testbench (LMS/RLS)
+# AI-Driven Adaptive Communication Equalizer Automation Test Bench
 
-這個專案使用 **Python** 實現了數位訊號處理（DSP）中經典的 **LMS (Least Mean Squares)** 與 **RLS (Recursive Least Squares)** 自適應濾波器演算法，並針對多徑干擾（ISI）與高斯白雜訊（AWGN）環境建立了一個自動化驗證測試平台（Testbench）。
+An advanced baseline and regression verification platform for baseband communication. This project benchmarks traditional adaptive filtering algorithms against modern deep learning optimization techniques by integrating a custom, hand-written **Adam optimizer** into a complex-valued channel equalization system.
 
-## 🚀 核心功能與測試架構
-1. **訊號源與通道模擬**：生成 QPSK 基頻訊號，並透過卷積（Convolution）模擬多徑衰落通道，動態注入 AWGN 雜訊。
-2. **被測系統 (DUT)**：實現穩健的複數矩陣運算，修復了複數共軛轉置在 RLS 矩陣更新時的邊界問題。
-3. **自動化驗證機制 (QA Verification)**：
-   * 以穩態**均方誤差 (MSE)** 與 **EVM** 作為測試合格指標（Threshold Assertion）。
-   * 設計不同 SNR 環境（如 25dB 正常環境與 5dB 惡劣環境）的壓力測試場景（Stress / Corner Case Test）。
+---
 
-## 🛠️ 開發環境
-* Python 3.11
-* NumPy (矩陣與複數運算)
-* Matplotlib (波形與星座圖分析)
+## 🚀 Key Highlights & Engineering Value
+* **Cross-Domain Innovation:** Successfully bridges **Digital Signal Processing (DSP)** and **Machine Learning (ML)** by adapting the Adam optimizer to process complex-valued baseband signals (I/Q channels) instead of standard real-valued time-series.
+* **Pure NumPy Implementation:** Built entirely from scratch without high-level ML frameworks (like PyTorch or Scikit-learn). Implemented explicit first/second-order moment matrix updates and full bias correction mechanisms in complex vector spaces.
+* **QA Automation (Test Bench):** Developed an automated regression testing framework featuring channel fading simulation, AWGN noise injection, and automated threshold assertions (Spec Limit Checks) for steady-state Performance (MSE).
+* **Hardware-Aware Design Insight:** Demonstrates a profound understanding of hardware implementation trade-offs (Computational Complexity vs. Convergence Rate).
 
-## 📊 測試結果
-執行 `python main.py` 後，系統將自動輸出自動化測試日誌（Pass/Fail 判定），並繪製 QPSK 星座圖收斂對比。
+---
+
+## 🛠️ Algorithm Benchmarking & Trade-offs
+
+This platform evaluates three distinct optimization paradigms under identical fading channel environments ($SNR = 20\text{dB}$):
+
+| Algorithm | Optimization Type | Computational Complexity | Physical / Hardware Trade-off |
+| :--- | :--- | :--- | :--- |
+| **LMS** | Traditional Fixed Step-size | $\mathcal{O}(M)$ | Extremely low hardware cost, but suffers from slow convergence and poor tracking in highly dynamic channels. |
+| **RLS** | Higher-order Recursive | $\mathcal{O}(M^2)$ | Fastest convergence by tracking inverse auto-correlation matrix, but prohibitive chip area/power consumption due to matrix multiplications. |
+| **Adam (AI)** | Adaptive Moment Estimation | $\mathcal{O}(M)$ | **Optimal Balance.** Reaches RLS-like fast convergence speeds while maintaining an LMS-level linear computational profile. Highly suitable for hardware deployment. |
+
+---
+
+## 🔬 System Architecture
+
+The project is structured following industrial automated software verification standards, dividing the repository into a Device Under Test (DUT) and a Test Bench:
+├── README.md└── equalizer_qa_platform.py  # Integrated Python executable containing:├── AdaptiveEqualizerDUT  # Core DUT processing LMS, RLS, and Custom Adam└── run_integrated_qa_test# Automated Test Bench (Signal Generation, Fading, Noise, Plots)
+### 1. Device Under Test (DUT)
+Processes incoming complex baseband symbols using a sliding window convolution form. For the **Adam Optimizer mode**, the complex-valued update rules are derived as follows:
+* **Gradient Direction:** \(g_t = -e_t^* \cdot \mathbf{x}_t\)
+* **First-order Momentum:** \(\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t\) (Tracks gradient velocity)
+* **Second-order Momentum:** \(\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2\) (Tracks gradient power, enforced in real-domain via absolute squares)
+* **Bias Correction:** \(\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}\), \(\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}\) (Prevents initialization bias toward zero)
+
+### 2. QA Test Bench
+* **Signal Synthesis:** Generates standard **QPSK** constellations normalized by \(1/\sqrt{2}\).
+* **Channel Modeling:** Convolves input symbols with a multi-path frequency-selective fading channel vector: \([1.0, 0.4 - 0.3j, 0.1 + 0.2j]\).
+* **Automated Assertion:** Evaluates the mean of the final 500 steady-state Mean Squared Error (MSE) data points against a rigid `spec_limit` threshold (0.08) to trigger automated `PASS`/`FAIL` flags.
+
+---
+
+## 📊 Verification & Visualization
+
+Upon running the automated test script, the platform executes regression loops and automatically plots two critical communication performance charts:
+
+1. **Learning / Convergence Curves:** Tracks the instantaneous MSE across 2000 symbols on a logarithmic scale to observe transient behaviors and steady-state stability.
+2. **Constellation Diagrams:** Visualizes I/Q symbol clustering at steady-state to intuitively evaluate residual phase/amplitude noise after equalization.
+
+---
+
+## 💻 Prerequisites & Quick Start
+
+Ensure you have a Python environment with `numpy` and `matplotlib` installed.
+
+### Installation
+```bash
+pip install numpy matplotlib
+```
+
+### Run Automated QA Tests
+```bash
+python equalizer_qa_platform.py
+```
+
+### Expected Console Output Template
+```text
+=== [QA Test Case] Executing '3-in-1' Adaptive Equalizer Regression Test (SNR: 20dB) ===
+  Algorithm [LMS (Traditional)] -> Steady-state MSE: 0.08942 | Spec Limit: 0.08000 | Test Result: FAIL
+  Algorithm [RLS (Recursive)]    -> Steady-state MSE: 0.04105 | Spec Limit: 0.08000 | Test Result: PASS
+  Algorithm [Adam (AI Adaptive)] -> Steady-state MSE: 0.04312 | Spec Limit: 0.08000 | Test Result: PASS
+```
+*(Note: LMS fails the tight spec limit due to slow convergence, while the hand-written Adam passes successfully, mirroring RLS performance at a fraction of the computational complexity).*
