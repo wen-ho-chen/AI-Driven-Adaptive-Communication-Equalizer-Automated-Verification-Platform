@@ -72,4 +72,4 @@ python equalizer_qa_platform.py
   Algorithm [RLS (Recursive)]    -> Steady-state MSE: 0.08843 | Spec Limit: 0.10000 | Test Result: PASS
   Algorithm [Adam (AI Adaptive)] -> Steady-state MSE: 0.09547 | Spec Limit: 0.10000 | Test Result: PASS
 ```
-*(Note: LMS fails the tight spec limit due to slow convergence, while the hand-written Adam passes successfully, mirroring RLS performance at a fraction of the computational complexity).*
+
