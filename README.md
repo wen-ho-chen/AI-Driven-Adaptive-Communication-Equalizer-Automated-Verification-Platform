@@ -30,21 +30,22 @@ The project is structured following industrial automated software verification s
 ├── README.md└── equalizer_qa_platform.py  # Integrated Python executable containing:├── AdaptiveEqualizerDUT  # Core DUT processing LMS, RLS, and Custom Adam└── run_integrated_qa_test# Automated Test Bench (Signal Generation, Fading, Noise, Plots)
 ### 1. Device Under Test (DUT)
 Processes incoming complex baseband symbols using a sliding window convolution form. For the **Adam Optimizer mode**, the complex-valued update rules are derived as follows:
-**Gradient Direction**:  
+
+**Gradient Direction**:
 $g_t = -e_t^* \cdot \mathbf{x}_t$
 
-**First Moment**: (Tracks gradient velocity)  
+**First Moment**: (Tracks gradient velocity)
 $$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$$
 
-**Second Moment**: (Tracks gradient power, enforced via absolute squaring in the real domain)  
+**Second Moment**: (Tracks gradient power, enforced via absolute squaring in the real domain)
 $$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)|\mathbf{g}_t|^2$$
 
-**Bias Correction**: (Prevents bias from tending towards zero)  
+**Bias Correction**: (Prevents bias from tending towards zero)
 $$\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}, \quad \hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}$$
 
-
 ### 2. QA Test Bench
-* **Signal Synthesis:** Generates standard **QPSK** constellations normalized by $1/\sqrt{2}$.
+**Signal Synthesis**: Generates standard QPSK constellations normalized by $\frac{1}{\sqrt{2}}$.
+
 * **Channel Modeling:** Convolves input symbols with a multi-path frequency-selective fading channel vector: \([1.0, 0.4 - 0.3j, 0.1 + 0.2j]\).
 * **Automated Assertion:** Evaluates the mean of the final 500 steady-state Mean Squared Error (MSE) data points against a rigid `spec_limit` threshold (0.1) to trigger automated `PASS`/`FAIL` flags.
 
