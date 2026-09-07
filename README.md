@@ -14,7 +14,7 @@ An advanced baseline and regression verification platform for baseband communica
 
 ## 🛠️ Algorithm Benchmarking & Trade-offs
 
-This platform evaluates three distinct optimization paradigms under identical fading channel environments ($SNR = 20\text{dB}$):
+This platform evaluates three distinct optimization paradigms under identical fading channel environments ($SNR = 15\text{dB}$):
 
 | Algorithm | Optimization Type | Computational Complexity | Physical / Hardware Trade-off |
 | :--- | :--- | :--- | :--- |
@@ -30,13 +30,21 @@ The project is structured following industrial automated software verification s
 ├── README.md└── equalizer_qa_platform.py  # Integrated Python executable containing:├── AdaptiveEqualizerDUT  # Core DUT processing LMS, RLS, and Custom Adam└── run_integrated_qa_test# Automated Test Bench (Signal Generation, Fading, Noise, Plots)
 ### 1. Device Under Test (DUT)
 Processes incoming complex baseband symbols using a sliding window convolution form. For the **Adam Optimizer mode**, the complex-valued update rules are derived as follows:
-* **Gradient Direction:** \(g_t = -e_t^* \cdot \mathbf{x}_t\)
-* **First-order Momentum:** \(\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t\) (Tracks gradient velocity)
-* **Second-order Momentum:** \(\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2\) (Tracks gradient power, enforced in real-domain via absolute squares)
-* **Bias Correction:** \(\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}\), \(\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}\) (Prevents initialization bias toward zero)
+**Gradient Direction**:  
+$g_t = -e_t^* \cdot \mathbf{x}_t$
+
+**First Moment**: (Tracks gradient velocity)  
+$$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$$
+
+**Second Moment**: (Tracks gradient power, enforced via absolute squaring in the real domain)  
+$$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)|\mathbf{g}_t|^2$$
+
+**Bias Correction**: (Prevents bias from tending towards zero)  
+$$\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}, \quad \hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}$$
+
 
 ### 2. QA Test Bench
-* **Signal Synthesis:** Generates standard **QPSK** constellations normalized by \(1/\sqrt{2}\).
+* **Signal Synthesis:** Generates standard **QPSK** constellations normalized by $1/\sqrt{2}$.
 * **Channel Modeling:** Convolves input symbols with a multi-path frequency-selective fading channel vector: \([1.0, 0.4 - 0.3j, 0.1 + 0.2j]\).
 * **Automated Assertion:** Evaluates the mean of the final 500 steady-state Mean Squared Error (MSE) data points against a rigid `spec_limit` threshold (0.1) to trigger automated `PASS`/`FAIL` flags.
 
