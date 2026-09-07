@@ -36,12 +36,12 @@ $g_t = -e_t^* \cdot \mathbf{x}_t$
 
 First Moment: (Tracks gradient velocity)
 ```math
-\(\mathbf{m}_t = \beta_1 \mathbf{m}_\){t-1} \(+ (1-\beta_1)\)g_t
+$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$
 ```
 
 Second Moment: (Tracks gradient power, enforced via absolute squaring in the real domain)
 ```math
-\(\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2 \%\%\)MAGIT_PARSER_PROTECT%%```
+$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2$
 
 
 
