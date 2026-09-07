@@ -35,14 +35,14 @@ Processes incoming complex baseband symbols using a sliding window convolution f
 $g_t = -e_t^* \cdot \mathbf{x}_t$
 
 First Moment: (Tracks gradient velocity)
-$$
-\mathbf{m}\_t = \beta\_1 \mathbf{m}\_{t-1} + (1-\beta\_1)g\_t
-$$
+```math
+\(\mathbf{m}_t = \beta_1 \mathbf{m}_\){t-1} \(+ (1-\beta_1)\)g_t
+```
 
 Second Moment: (Tracks gradient power, enforced via absolute squaring in the real domain)
-$$
-\mathbf{v}\_t = \beta\_2 \mathbf{v}\_{t-1} + (1-\beta\_2)|\mathbf{g}\_t|^2
-$$
+```math
+\(\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2 \%\%\)MAGIT_PARSER_PROTECT%%```
+
 
 
 
