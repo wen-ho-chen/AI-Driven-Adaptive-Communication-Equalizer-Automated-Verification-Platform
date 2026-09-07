@@ -34,17 +34,9 @@ Processes incoming complex baseband symbols using a sliding window convolution f
 **Gradient Direction**:
 $g_t = -e_t^* \cdot \mathbf{x}_t$
 
-First Moment: (Tracks gradient velocity)
-```math
-$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$
-```
+* **First-order Momentum:** $\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$ (Tracks gradient velocity)
 
-Second Moment: (Tracks gradient power, enforced via absolute squaring in the real domain)
-```math
-$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2$
-
-
-
+* **Second-order Momentum:** $\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2$ (Tracks gradient power, enforced in real-domain via absolute squares)
 
 **Bias Correction**: (Prevents bias from tending towards zero)
 $$\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}, \quad \hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}$$
