@@ -31,14 +31,14 @@ The project is structured following industrial automated software verification s
 ### 1. Device Under Test (DUT)
 Processes incoming complex baseband symbols using a sliding window convolution form. For the **Adam Optimizer mode**, the complex-valued update rules are derived as follows:
 
-**Gradient Direction**:
-$g_t = -e_t^* \cdot \mathbf{x}_t$
+* **Gradient Direction**:
+$$g_t = -e_t^* \cdot \mathbf{x}_t$$
 
-* **First-order Momentum:** $\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$ (Tracks gradient velocity)
+* **First-order Momentum:** $$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1-\beta_1)g_t$$ (Tracks gradient velocity)
 
-* **Second-order Momentum:** $\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2$ (Tracks gradient power, enforced in real-domain via absolute squares)
+* **Second-order Momentum:** $$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1-\beta_2)\vert{}\mathbf{g}_t\vert{}^2$$ (Tracks gradient power, enforced in real-domain via absolute squares)
 
-**Bias Correction**: (Prevents bias from tending towards zero)
+* **Bias Correction**: (Prevents bias from tending towards zero)
 $$\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}, \quad \hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1-\beta_2^t}$$
 
 ### 2. QA Test Bench
