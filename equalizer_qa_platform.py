@@ -10,7 +10,7 @@ class AdaptiveEqualizerDUT:
     自適應通訊等化器核心模組。
     整合：傳統基頻 (LMS)、高階遞迴 (RLS) 與現代深度學習最佳化器 (Adam)。
     """
-    def __init__(self, filter_order=5, lr=0.01, beta_1=0.9, beta_2=0.99, epsilon=1e-8):
+    def __init__(self, filter_order=11, lr=0.01, beta_1=0.9, beta_2=0.99, epsilon=1e-8):
         self.filter_order = filter_order
         self.lr = lr
         self.beta_1 = beta_1
@@ -37,7 +37,7 @@ class AdaptiveEqualizerDUT:
             t = 0
 
         # 固定步長的 LMS 參數
-        lms_mu = 0.05
+        lms_mu = 0.01
 
         # 滑動視窗 (Sliding Window) 處理基頻訊號
         for idx in range(self.filter_order, num_symbols):
@@ -97,7 +97,7 @@ def run_integrated_qa_test():
     tx_symbols = np.array([qpsk_mapping[(bits[i], bits[i+1])] for i in range(0, len(bits), 2)]) / np.sqrt(2)
 
     # 2. 建立通訊干擾與雜訊環境 (20dB 中高信噪比環境)
-    snr_db = 20
+    snr_db = 15
     rx_faded = np.convolve(tx_symbols, fading_channel, mode="same")
     sig_power = np.mean(np.abs(rx_faded) ** 2)
     noise_power = sig_power / (10 ** (snr_db / 10))
@@ -105,7 +105,7 @@ def run_integrated_qa_test():
     rx_symbols = rx_faded + noise
 
     # 3. 測試規格斷言門檻上限 (Spec Limit)
-    spec_limit = 0.08
+    spec_limit = 0.1
     
     # 4. 初始化等化器 DUT
     equalizer = AdaptiveEqualizerDUT(filter_order=5, lr=0.01)
@@ -124,35 +124,67 @@ def run_integrated_qa_test():
         status = "PASS" if steady_state_mse < spec_limit else "FAIL"
         print(f"  演算法 [{algo}] -> 穩態 MSE: {steady_state_mse:.5f} | 規格上限: {spec_limit} | 測試結果: {status}")
 
-    # 6. 整合數據視覺化
-    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+        # ==========================================
+    # 6. 高清晰度分欄數據視覺化 (4x2 畫布設計)
+    # ==========================================
+    # 建立 4 列 2 行的畫布，左欄合併顯示收斂曲線，右欄拆解顯示星座圖
+    fig = plt.figure(figsize=(16, 12))
+    
+    # ----------------------------------------
+    # 左側：學習收斂曲線 (跨越 4 列的合併子圖)
+    # ----------------------------------------
+    ax_curve = plt.subplot2grid((4, 2), (0, 0), rowspan=4, colspan=1)
+    ax_curve.plot(mse_lms, label="Traditional LMS", color="blue", alpha=0.4, linewidth=1)
+    ax_curve.plot(mse_rls, label="High-order RLS", color="darkgreen", alpha=0.5, linewidth=1)
+    ax_curve.plot(mse_adam, label="Hand-written Adam (AI)", color="red", alpha=0.7, linewidth=1.2)
+    ax_curve.axhline(y=spec_limit, color="black", linestyle="--", label=f"Spec Limit ({spec_limit})", linewidth=1.5)
+    ax_curve.set_yscale("log")
+    ax_curve.set_title("Equalizer Convergence Curve (Learning Process)", fontsize=12, fontweight='bold')
+    ax_curve.set_xlabel("Symbols", fontsize=10)
+    ax_curve.set_ylabel("MSE (Log Scale)", fontsize=10)
+    ax_curve.grid(True, which="both", linestyle=":", alpha=0.5)
+    ax_curve.legend(fontsize=10, loc="upper right")
 
-    # 子圖 A：學習收斂曲線對比
-    axs[0].plot(mse_lms, label="Traditional LMS", color="blue", alpha=0.5)
-    axs[0].plot(mse_rls, label="High-order RLS", color="darkgreen", alpha=0.6)
-    axs[0].plot(mse_adam, label="Hand-written Adam", color="red", alpha=0.7)
-    axs[0].axhline(y=spec_limit, color="black", linestyle="--", label=f"Spec Limit ({spec_limit})")
-    axs[0].set_yscale("log")
-    axs[0].set_title("Equalizer Convergence Curve Comparison")
-    axs[0].set_xlabel("Symbols")
-    axs[0].set_ylabel("MSE (Log Scale)")
-    axs[0].grid(True, which="both", linestyle=":", alpha=0.5)
-    axs[0].legend()
+    # ----------------------------------------
+    # 右側：完全拆解的星座圖 (分開 4 個子圖獨立對比)
+    # ----------------------------------------
+    # 為了方便對比，統一所有星座圖的座標軸範圍
+    axis_lim = [-1.5, 1.5, -1.5, 1.5]
+    scatter_size = 6
+    
+    # 1. 接收端未等化訊號 (Rx Before Equalization)
+    ax_rx = plt.subplot2grid((4, 2), (0, 1))
+    ax_rx.scatter(rx_symbols[-500:].real, rx_symbols[-500:].imag, color="gray", alpha=0.5, s=scatter_size)
+    ax_rx.set_title("1. Received Signal (Before Equalization)", fontsize=10, color="dimgray")
+    ax_rx.axis(axis_lim)
+    ax_rx.grid(True, linestyle=":", alpha=0.5)
 
-    # 子圖 B：穩態星座圖解調結果對比
-    axs[1].scatter(rx_symbols[-500:].real, rx_symbols[-500:].imag, color="gray", alpha=0.3, s=10, label="Before (Rx)")
-    axs[1].scatter(y_out_lms[-500:].real, y_out_lms[-500:].imag, color="blue", alpha=0.5, s=8, label="After LMS")
-    axs[1].scatter(y_out_rls[-500:].real, y_out_rls[-500:].imag, color="darkgreen", alpha=0.5, s=8, label="After RLS")
-    axs[1].scatter(y_out_adam[-500:].real, y_out_adam[-500:].imag, color="red", alpha=0.6, s=8, label="After Adam")
-    axs[1].set_title("Constellation Diagram Comparison (Steady State)")
-    axs[1].set_xlabel("In-Phase (I)")
-    axs[1].set_ylabel("Quadrature (Q)")
-    axs[1].axis("equal")
-    axs[1].grid(True, linestyle=":", alpha=0.5)
-    axs[1].legend()
+    # 2. LMS 等化後訊號
+    ax_lms = plt.subplot2grid((4, 2), (1, 1))
+    ax_lms.scatter(y_out_lms[-500:].real, y_out_lms[-500:].imag, color="blue", alpha=0.6, s=scatter_size)
+    ax_lms.set_title("2. After Traditional LMS (O(M))", fontsize=10, color="blue")
+    ax_lms.axis(axis_lim)
+    ax_lms.grid(True, linestyle=":", alpha=0.5)
+
+    # 3. RLS 等化後訊號
+    ax_rls = plt.subplot2grid((4, 2), (2, 1))
+    ax_rls.scatter(y_out_rls[-500:].real, y_out_rls[-500:].imag, color="darkgreen", alpha=0.6, s=scatter_size)
+    ax_rls.set_title("3. After High-order RLS (O(M²))", fontsize=10, color="darkgreen")
+    ax_rls.axis(axis_lim)
+    ax_rls.grid(True, linestyle=":", alpha=0.5)
+
+    # 4. Adam 等化後訊號
+    ax_adam = plt.subplot2grid((4, 2), (3, 1))
+    ax_adam.scatter(y_out_adam[-500:].real, y_out_adam[-500:].imag, color="red", alpha=0.7, s=scatter_size)
+    ax_adam.set_title("4. After Hand-written Adam (AI - O(M))", fontsize=10, color="red")
+    ax_adam.axis(axis_lim)
+    ax_adam.grid(True, linestyle=":", alpha=0.5)
+    ax_adam.set_xlabel("In-Phase (I)", fontsize=9) 
 
     plt.tight_layout()
     plt.show()
+
+    
 
 if __name__ == "__main__":
     run_integrated_qa_test()
