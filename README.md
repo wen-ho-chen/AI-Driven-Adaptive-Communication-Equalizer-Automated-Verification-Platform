@@ -44,7 +44,7 @@ $$\hat{\mathbf{m}}_t = \frac{\mathbf{m}_t}{1-\beta_1^t}, \quad \hat{\mathbf{v}}_
 ### 2. QA Test Bench
 **Signal Synthesis**: Generates standard QPSK constellations normalized by $\frac{1}{\sqrt{2}}$.
 
-* **Channel Modeling:** Convolves input symbols with a multi-path frequency-selective fading channel vector: \([1.0, 0.4 - 0.3j, 0.1 + 0.2j]\).
+* **Channel Modeling:** Convolves input symbols with a multi-path frequency-selective fading channel vector: [1.0, 0.4 - 0.3j, 0.1 + 0.2j].
 * **Automated Assertion:** Evaluates the mean of the final 500 steady-state Mean Squared Error (MSE) data points against a rigid `spec_limit` threshold (0.1) to trigger automated `PASS`/`FAIL` flags.
 
 ---
