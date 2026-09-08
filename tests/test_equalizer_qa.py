@@ -5,7 +5,7 @@ from src.equalizer_dut import AdaptiveEqualizerDUT
 
 @pytest.fixture
 def test_data():
-    """完美還原會過的環境數據"""
+    
     np.random.seed(42)
     num_symbols = 2000
     fading_channel = np.array([1.0, 0.4 - 0.3j, 0.1 + 0.2j])
@@ -27,12 +27,11 @@ def test_data():
 def test_equalizer_regression(test_data, algo_name):
     rx_symbols, tx_symbols = test_data
     
-    # 🌟 核心關鍵：嚴格指定 filter_order=5, lr=0.01，與你原本會過的一模一樣！
+    
     equalizer = AdaptiveEqualizerDUT(filter_order=5, lr=0.01)
     
     _, mse_data = equalizer.equalize(rx_symbols, tx_symbols, algo=algo_name)
     
-    # 取最後 500 點穩態平均
     steady_state_mse = np.mean(mse_data[-500:])
     spec_limit = 0.1
     
