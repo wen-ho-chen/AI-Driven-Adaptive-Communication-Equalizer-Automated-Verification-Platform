@@ -1,0 +1,45 @@
+name: CI Automation Test Pipeline
+
+# 觸發條件：當 main 分支收到 push 或 pull_request 時自動執行
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # 使用最新的 Linux 虛擬環境
+
+    steps:
+    # Step 1: 複製 GitHub 倉庫代碼到虛擬機中
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    # Step 2: 設定 Python 執行環境
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    # Step 3: 快取機制（加速後續的套件安裝，展現高階軟體思維）
+    - name: Cache pip dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    # Step 4: 安裝專案依賴套件
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    # Step 5: 執行自動化測試平台 (將 src 加入 Python 路徑，並執行 pytest)
+    - name: Run Equalizer QA Regression Tests
+      env:
+        PYTHONPATH: ${{ github.workspace }}
+      run: |
+        pytest tests/ -v --tb=short
