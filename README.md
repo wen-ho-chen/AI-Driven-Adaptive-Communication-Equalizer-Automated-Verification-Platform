@@ -12,7 +12,7 @@ The entire architecture is partitioned into a clean **DUT (Device Under Test)** 
 
 ## 🚀 Key Highlights & Engineering Value
 * **Cross-Domain Innovation:** Successfully bridges **Digital Signal Processing (DSP)** and **Machine Learning (ML)** by adapting the Adam optimizer to process complex-valued baseband signals (I/Q channels) instead of standard real-valued time-series.
-* **Pure NumPy Implementation:** Built entirely from scratch without high-level ML frameworks (like PyTorch or Scikit-learn). Implemented explicit first/second-order moment matrix updates and full bias correction mechanisms in complex vector spaces (\(\mathbb{C}\)).
+* **Pure NumPy Implementation:** Built entirely from scratch without high-level ML frameworks (like PyTorch or Scikit-learn). Implemented explicit first/second-order moment matrix updates and full bias correction mechanisms in complex vector spaces ($\mathbb{C}$).
 * **Modern QA Automation:** Developed a production-standard automated regression testing framework utilizing `pytest` and automated threshold assertions (Spec Limit Checks) for steady-state Performance (MSE), completely isolated to prevent cross-test state pollution.
 * **Hardware-Aware Design Insight:** Demonstrates a profound understanding of hardware implementation trade-offs (Computational Complexity vs. Convergence Rate) for IC deployment.
 
@@ -24,9 +24,9 @@ This platform evaluates three distinct optimization paradigms under identical fa
 
 | Algorithm | Optimization Type | Computational Complexity | Physical / Hardware Trade-off |
 | :--- | :--- | :--- | :--- |
-| **LMS** | Traditional Fixed Step-size | \(\mathcal{O}(M)\) | Extremely low hardware cost, but suffers from slow convergence and poor tracking in highly dynamic channels. |
-| **RLS** | Higher-order Recursive | \(\mathcal{O}(M^2)\) | Fastest convergence by tracking inverse auto-correlation matrix, but prohibitive chip area/power consumption due to matrix multiplications. |
-| **Adam (AI)** | Adaptive Moment Estimation | \(\mathcal{O}(M)\) | **Optimal Balance.** Reaches RLS-like fast convergence speeds while maintaining an LMS-level linear computational profile. Highly suitable for hardware deployment. |
+| **LMS** | Traditional Fixed Step-size | $\mathcal{O}(M)$ | Extremely low hardware cost, but suffers from slow convergence and poor tracking in highly dynamic channels. |
+| **RLS** | Higher-order Recursive |  $\mathcal{O}(M^2)$| Fastest convergence by tracking inverse auto-correlation matrix, but prohibitive chip area/power consumption due to matrix multiplications. |
+| **Adam (AI)** | Adaptive Moment Estimation |  $\mathcal{O}(M)$ | **Optimal Balance.** Reaches RLS-like fast convergence speeds while maintaining an LMS-level linear computational profile. Highly suitable for hardware deployment. |
 
 ---
 
