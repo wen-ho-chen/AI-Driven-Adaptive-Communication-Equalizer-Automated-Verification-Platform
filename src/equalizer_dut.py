@@ -60,7 +60,7 @@ class AdaptiveEqualizerDUT:
                 
             elif algo == "Adam":
                 t += 1
-                g_t = -e.conj() * x  # 複數梯度方向
+                g_t = e.conj() * x  # 複數梯度方向
                 
                 # 一階動量更新 (追蹤梯度方向)
                 m_t = self.beta_1 * m_t + (1 - self.beta_1) * g_t
@@ -72,7 +72,7 @@ class AdaptiveEqualizerDUT:
                 v_cap = v_t / (1 - (self.beta_2 ** t))
                 
                 # 權重更新：結合 Adam 動態步長
-                w -= (self.lr * m_cap) / (np.sqrt(v_cap) + self.epsilon)
+                w += (self.lr * m_cap) / (np.sqrt(v_cap) + self.epsilon)
 
         return y_out, mse
 
